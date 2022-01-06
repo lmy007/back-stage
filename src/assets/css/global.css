@@ -7,3 +7,14 @@ body,
 #app {
   height: 100%;
 }
+
+.el-breadcrumb {
+  margin-bottom: 15px;
+}
+.el-card {
+  box-shadow: 0 1px 1px rgba(99, 63, 63, 0.15) !important;
+}
+
+.el-pagination {
+  margin-top: 10px;
+}
