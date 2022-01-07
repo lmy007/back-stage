@@ -29,12 +29,12 @@
           <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949" @change="updateState(scope.row.id, scope.row.mg_state)"> </el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="操作">
+      <el-table-column label="操作" width="200">
         <template #default="scope">
           <el-button type="primary" icon="el-icon-edit" size="mini" @click="getEditUserInfo(scope.row.id)"></el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteUser(scope.row.id)"></el-button>
           <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-            <el-button type="warning" icon="el-icon-s-tools" size="mini"></el-button>
+            <el-button type="warning" icon="el-icon-s-tools" size="mini" @click="allocateRole(scope.row)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -42,7 +42,7 @@
     <!-- pagenation section -->
     <el-pagination @size-change="handerSizeChange" @current-change="handerCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[2, 3, 4, 5]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
 
-    <!-- addUser section-->
+    <!-- addUser Dialogue-->
     <el-dialog title="添加用户" :visible.sync="addUserDialog" width="50%" @close="addDialogClose">
       <el-form :model="addUserForm" :rules="addUserRules" ref="addUserForm" label-width="15%">
         <el-form-item label="用户名" prop="username">
@@ -64,7 +64,7 @@
       </span>
     </el-dialog>
 
-    <!-- editUser section -->
+    <!-- editUser Dialogue -->
     <el-dialog title="修改用户" :visible.sync="editUserDialog" width="50%" @close="editDialogClose">
       <el-form :model="editUserForm" :rules="editUserRules" ref="editUserForm" label-width="15%">
         <el-form-item label="用户名">
@@ -80,6 +80,22 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="editUserDialog = false">取 消</el-button>
         <el-button type="primary" @click="editUser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- allocateRole Dialogue -->
+    <el-dialog title="分配角色" :visible.sync="allocateRoleDialog" width="50%" @close="allocateRoleDialogClose">
+      <p>当前的用户: {{ allocateRoleInfo.username }}</p>
+      <p>当前的角色: {{ allocateRoleInfo.role_name }}</p>
+      <p>
+        分配新角色:
+        <el-select v-model="selectedRoleId" placeholder="请选择角色">
+          <el-option v-for="item in allRoleInfo" :key="item.id" :label="item.roleName" :value="item.id"> </el-option>
+        </el-select>
+      </p>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="allocateRoleDialog = false">取 消</el-button>
+        <el-button type="primary" @click="saveAllocateRole">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -125,7 +141,11 @@ export default {
       // editUser section
       editUserDialog: false,
       editUserForm: {},
-
+      // allocateRole Section
+      allocateRoleDialog: false,
+      allocateRoleInfo: {},
+      allRoleInfo: [],
+      selectedRoleId: '',
       // validate rule section
       // addUserRules
       addUserRules: {
@@ -262,6 +282,30 @@ export default {
           this.$message.error('删除失败')
         }
       }
+    },
+    // allocate role section
+    async allocateRole(userInfo) {
+      this.allocateRoleInfo = userInfo
+      const { data: res } = await this.$http.get('roles')
+      this.allRoleInfo = res.data
+      this.allocateRoleDialog = true
+    },
+    async saveAllocateRole() {
+      console.log(this.selectedRoleId)
+      if (!this.selectedRoleId) {
+        return this.$message.error('请选择分配的角色')
+      }
+      const { data: res } = await this.$http.put(`users/${this.allocateRoleInfo.id}/role`, { rid: this.selectedRoleId })
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配失败')
+      }
+      this.$message.success('分配角色成功')
+      this.getUserList()
+      console.log(res)
+      this.allocateRoleDialog = false
+    },
+    allocateRoleDialogClose() {
+      this.selectedRoleId = ''
     }
   }
 }
