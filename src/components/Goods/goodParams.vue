@@ -148,6 +148,11 @@ export default {
       this.getGoodParams()
     },
     async getGoodParams() {
+      if (this.selectedGoodCate.length !== 3) {
+        this.selectedGoodCate = []
+        this.tableParamsData = []
+        return
+      }
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, { params: { sel: this.activeTabName } })
       if (res.meta.status !== 200) {
         this.$message.info('获取参数列表失败')
