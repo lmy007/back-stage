@@ -18,3 +18,13 @@ body,
 .el-pagination {
   margin-top: 10px;
 }
+.el-cascader-menu {
+  height: 300px;
+}
+.el-tag {
+  margin: 5px 10px;
+}
+/* .el-cascader-menu__wrap,
+.el-scrollbar__wrap {
+  height: 290px !important;
+} */
