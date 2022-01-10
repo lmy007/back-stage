@@ -17,11 +17,12 @@
         </el-form-item>
       </el-form>
 
-      <!-- Tab manyParams &&onlyParams -->
+      <!-- Tab -->
       <el-tabs v-model="activeTabName" @tab-click="handleTabClick">
         <el-tab-pane label="动态参数" name="many">
           <el-button type="primary" size="mini" :disabled="isDisabled" @click="showAddParamsDialog">添加参数</el-button>
-          <el-table :data="tableParamsData" style="width: 100%" border>
+          <!-- ManyTableData -->
+          <el-table :data="manyTableData" style="width: 100%" border>
             <el-table-column type="expand">
               <template #default="scope">
                 <el-tag closable @close="deleteParamsValue(scope.row, i)" v-for="(item, i) in scope.row.attr_vals" :key="i">{{ item }}</el-tag>
@@ -42,8 +43,14 @@
         <!-- Tab OnlyParams -->
         <el-tab-pane label="静态属性" name="only">
           <el-button type="primary" size="mini" :disabled="isDisabled" @click="showAddParamsDialog">添加参数</el-button>
-          <el-table :data="tableParamsData" style="width: 100%" border>
-            <el-table-column type="expand"></el-table-column>
+          <el-table :data="onlyTableData" style="width: 100%" border>
+            <el-table-column type="expand">
+              <template #default="scope">
+                <el-tag closable @close="deleteParamsValue(scope.row, i)" v-for="(item, i) in scope.row.attr_vals" :key="i">{{ item }}</el-tag>
+                <el-input class="input-new-tag" v-if="inputVisible" v-model="inputParamsValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"></el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
@@ -93,7 +100,8 @@ export default {
       activeTabName: 'many',
       inputVisible: false,
       inputParamsValue: '',
-      tableParamsData: [],
+      manyTableData: [],
+      onlyTableData: [],
       diaTitle: '',
       addParamsDialog: false,
       editParamsDialog: false,
@@ -150,22 +158,26 @@ export default {
     async getGoodParams() {
       if (this.selectedGoodCate.length !== 3) {
         this.selectedGoodCate = []
-        this.tableParamsData = []
+        this.ManyTableData = []
+        this.OnlyTableData = []
         return
       }
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, { params: { sel: this.activeTabName } })
       if (res.meta.status !== 200) {
         this.$message.info('获取参数列表失败')
       }
-      this.tableParamsData = res.data
-
-      this.tableParamsData.forEach((item) => {
+      res.data.forEach((item) => {
         if (!item.attr_vals) {
-          item.attr_val = []
+          item.attr_vals = []
         } else {
-          item.attr_vals = item.attr_vals.split(',')
+          item.attr_vals = item.attr_vals.split(' ')
         }
       })
+      if (this.activeTabName === 'many') {
+        this.manyTableData = res.data
+      } else {
+        this.onlyTableData = res.data
+      }
     },
     // ----------------------------------addParams---------------------------------------------------------------------
     showAddParamsDialog() {
@@ -242,7 +254,6 @@ export default {
     },
     // ----------------------------------addParamsValue--------------------
     handleInputConfirm(row) {
-      console.log(this.inputParamsValue.trim())
       if (this.inputParamsValue.trim()) {
         row.attr_vals.push(this.inputParamsValue.trim())
         this.editParamsValue(row)
@@ -261,7 +272,7 @@ export default {
       const { data: res } = await this.$http.put(`categories/${row.cat_id}/attributes/${row.attr_id}`, {
         attr_name: row.attr_name,
         attr_sel: row.attr_sel,
-        attr_vals: row.attr_vals.join(',')
+        attr_vals: row.attr_vals.join(' ')
       })
 
       if (res.meta.status !== 200) {
