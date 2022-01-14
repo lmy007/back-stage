@@ -9,10 +9,10 @@
           <el-input prefix-icon="el-icon-user-solid" v-model="loginForm.username"></el-input>
         </el-form-item>
         <el-form-item class="password" prop="password">
-          <el-input prefix-icon="el-icon-lock" v-model="loginForm.password" type="password"></el-input>
+          <el-input prefix-icon="el-icon-lock" v-model="loginForm.password" type="password" @keyup.enter.native="login"></el-input>
         </el-form-item>
         <el-form-item class="btn">
-          <el-button type="primary" @click="login" >Login</el-button>
+          <el-button type="primary" @click="login">Login</el-button>
           <el-button type="info" @click="resetLoginForm">Reset</el-button>
         </el-form-item>
       </el-form>
