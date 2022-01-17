@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-// import './plugins/element.js'
 import './plugins/tree-table.js'
 import './assets/css/global.css'
 import VueQuillEditor from 'vue-quill-editor'
