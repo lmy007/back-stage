@@ -8,6 +8,10 @@ import Rights from '../components/Auth/Rights.vue'
 import Roles from '../components/Auth/Roles.vue'
 import goodCate from '../components/Goods/goodCate.vue'
 import goodParams from '../components/Goods/goodParams.vue'
+import goodList from '../components/Goods/goodList.vue'
+import goodAdd from '../components/Goods/goodAdd.vue'
+import order from '../components/Order/order.vue'
+import report from '../components/report/report.vue'
 
 Vue.use(VueRouter)
 
@@ -36,7 +40,11 @@ const routes = [
         component: Roles
       },
       { path: '/categories', component: goodCate },
-      { path: '/params', component: goodParams }
+      { path: '/params', component: goodParams },
+      { path: '/goods', component: goodList },
+      { path: '/goods/add', component: goodAdd },
+      { path: '/orders', component: order },
+      { path: '/reports', component: report }
     ]
   }
 ]

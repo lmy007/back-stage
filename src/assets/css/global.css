@@ -24,6 +24,12 @@ body,
 .el-tag {
   margin: 5px 10px;
 }
+.ql-editor {
+  min-height: 300px;
+}
+/* .el-form-item__label {
+  text-align: left !important;
+} */
 /* .el-cascader-menu__wrap,
 .el-scrollbar__wrap {
   height: 290px !important;
